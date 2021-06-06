@@ -12,7 +12,7 @@ class RatingWidget extends StatefulWidget {
       this.size = 25,
       this.initialRating = 0,
       this.spacing = 8,
-      this.onRatingChanged,
+      @required this.onRatingChanged,
       this.readOnly = false})
       : super(key: key);
 
@@ -30,11 +30,43 @@ class _RatingWidgetState extends State<RatingWidget> {
     setState(() {});
   }
 
+  bool draggedOver(Offset position1, Offset position2, double size1, double size2)=>(position1.dx < position2.dx + size2 &&
+      position1.dx + size1 > position2.dx &&
+      position1.dy < position2.dy + size2 - 5 &&
+      position1.dy + size1 > position2.dy);
+
+  void onHorizontalDragUpdate(DragUpdateDetails details){
+    var position1 = details.globalPosition;
+    for(GlobalKey key in starKeys){
+      var position2 = key.globalPaintBounds.topLeft;
+      if(draggedOver(position1, position2, widget.size, widget.size)){
+        if(details.primaryDelta.isNegative){
+          //right to left drag
+          int index = starKeys.indexOf(key) + 1;
+          if(rating >= index){
+            setState(() {
+              rating = index - 1;
+            });
+          }
+        }else{
+          //left to right drag
+          int index = starKeys.indexOf(key) + 1;
+          if(rating < index){
+            setState(() {
+              rating = index;
+            });
+          }
+        }
+      }
+    }
+
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    rating = rating;
+    rating = widget.initialRating;
   }
 
   @override
@@ -70,11 +102,14 @@ class _RatingWidgetState extends State<RatingWidget> {
               ),
             ));
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 7.0, bottom: 14),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [...rated, ...unRated],
+    return GestureDetector(
+      onHorizontalDragUpdate: onHorizontalDragUpdate,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 7.0, bottom: 14),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [...rated, ...unRated],
+        ),
       ),
     );
   }
@@ -100,7 +135,8 @@ class StarWidget extends StatelessWidget {
           return Padding(
             padding: EdgeInsets.all(spacing),
             child: Image.asset(
-              'assets/png/star.png',
+              'src/asset/star.png',
+              package: 'rating',
               key: starKey,
               color: color,
               height: size,

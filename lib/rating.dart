@@ -1,7 +1,1 @@
-library rating;
-
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+export 'package:rating/src/rating_widget.dart';
