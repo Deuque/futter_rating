@@ -40,12 +40,13 @@ class _RatingWidgetState extends State<RatingWidget> {
     for(GlobalKey key in starKeys){
       var position2 = key.globalPaintBounds.topLeft;
       if(draggedOver(position1, position2, widget.size, widget.size)){
-        if(details.primaryDelta.isNegative){
+        if(details.primaryDelta.isNegative) {
           //right to left drag
           int index = starKeys.indexOf(key) + 1;
-          if(rating >= index){
+
+       if(rating > index){
             setState(() {
-              rating = index - 1;
+              rating = index;
             });
           }
         }else{
